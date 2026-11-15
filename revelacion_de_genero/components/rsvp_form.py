@@ -38,7 +38,7 @@ def rsvp_form() -> rx.Component:
                             name="guest_name",
                             placeholder="Escribe tu nombre",
                             value=RsvpState.guest_name,
-                            #on_change=RsvpState.set_guest_name,
+                            on_change=RsvpState.set_guest_name,
                             style=INPUT,
                             max_length=100,
                             required=True,

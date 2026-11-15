@@ -26,6 +26,11 @@ class RsvpState(rx.State):
     submitted: bool = False
 
     @rx.event
+    def set_guest_name(self, value: str):
+        self.guest_name = value
+        self.error_message = ""
+
+    @rx.event
     def set_attendance(self, value: str):
         self.attendance = value
         self.error_message = ""

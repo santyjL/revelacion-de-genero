@@ -86,7 +86,7 @@ BODY_TEXT = {
 
 LABEL = {
     "font_family": FONTS["sans"],
-    "font_size": "1rem",
+    "font_size": "1.3rem",
     "font_weight": "700",
     "letter_spacing": "0.08em",
     "text_transform": "uppercase",
@@ -101,7 +101,7 @@ INPUT = {
     "background_color": COLORS["white"],
     "color": COLORS["sepia"],
     "font_family": FONTS["sans"],
-    "font_size": "1rem",
+    "font_size": "1.3rem",
     "padding_inline": "0.95rem",
 }
 
