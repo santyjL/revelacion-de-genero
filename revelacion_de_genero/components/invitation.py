@@ -19,7 +19,7 @@ def invitation() -> rx.Component:
         corners(),
         rx.vstack(
             *[
-                rx.text(text, style=BODY_TEXT, font_size="1.05rem", text_align="center")
+                rx.text(text, style=BODY_TEXT, font_size="1.16rem", text_align="center", line_height="1.65")
                 for text in paragraphs
             ],
             spacing="4",

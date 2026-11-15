@@ -24,7 +24,7 @@ PAGE = {
     "background_image": "var(--paper-texture)",
     "color": COLORS["brown"],
     "font_family": FONTS["body"],
-    "font_size": "clamp(1rem, 2.6vw, 1.125rem)",
+    "font_size": "clamp(1.08rem, 2.8vw, 1.2rem)",
     "line_height": "1.65",
     "overflow_x": "hidden",
 }
@@ -86,7 +86,7 @@ BODY_TEXT = {
 
 LABEL = {
     "font_family": FONTS["sans"],
-    "font_size": "0.92rem",
+    "font_size": "1rem",
     "font_weight": "700",
     "letter_spacing": "0.08em",
     "text_transform": "uppercase",
@@ -115,7 +115,7 @@ BUTTON = {
     "font_weight": "700",
     "letter_spacing": "0.12em",
     "text_transform": "uppercase",
-    "font_size": "0.82rem",
+    "font_size": "0.94rem",
     "box_shadow": SHADOWS["soft"],
     "cursor": "pointer",
     "_hover": {"background_color": COLORS["brown"]},
@@ -129,18 +129,28 @@ OPTION_CARD = {
     "border": f"1px solid {COLORS['gold']}",
     "background_color": COLORS["white"],
     "font_family": FONTS["sans"],
-    "font_size": "0.95rem",
+    "font_size": "1.05rem",
     "text_align": "left",
     "cursor": "pointer",
     "color": COLORS["sepia"],
 }
 
 PHOTO_FRAME = {
-    "width": "min(86vw, 22rem)",
+    "width": "min(86vw, 27rem)",
     "padding": "0.7rem",
     "background": f"linear-gradient(135deg, {COLORS['gold']}, {COLORS['cream']}, {COLORS['gold']})",
     "border_radius": "0.4rem",
     "box_shadow": SHADOWS["paper"],
+}
+
+ULTRASOUND_VIDEO = {
+    "display": "block",
+    "width": "100%",
+    "height": "auto",
+    "aspect_ratio": "4 / 3",
+    "object_fit": "contain",
+    "background_color": COLORS["sepia"],
+    "border_radius": "0.2rem",
 }
 
 COUNT_CELL = {
@@ -194,6 +204,7 @@ BASE_STYLE = {
         "box_shadow": SHADOWS["soft"],
     },
     ".photo-frame": PHOTO_FRAME,
+    ".ultrasound-video": ULTRASOUND_VIDEO,
     ".count-cell": COUNT_CELL,
     ".team-boy": TEAM_BOY,
     ".team-girl": TEAM_GIRL,

@@ -11,6 +11,18 @@ from revelacion_de_genero.styles.theme import COLORS, FONTS, SPACE
 
 
 def _photo() -> rx.Component:
+    if settings.ultrasound_video_src:
+        return rx.el.video(
+            src=settings.ultrasound_video_src,
+            controls=True,
+            auto_play=True,
+            muted=True,
+            loop=True,
+            plays_inline=True,
+            preload="metadata",
+            class_name="ultrasound-video",
+            aria_label="Ultrasonido de nuestro pequeño milagro",
+        )
     if settings.baby_photo_src:
         return rx.image(
             src=settings.baby_photo_src,
@@ -58,7 +70,7 @@ def _verse() -> rx.Component:
 def baby_photo() -> rx.Component:
     return rx.vstack(
         tiny_icon("🎀"),
-        rx.heading("Nuestro pequeño milagro", as_="h2", font_size="clamp(1.3rem, 5vw, 1.9rem)"),
+        rx.heading("Nuestro pequeño milagro", as_="h2", font_size="clamp(1.6rem, 5.5vw, 2.2rem)"),
         flourish(),
         rx.box(_photo(), style=PHOTO_FRAME, class_name="photo-frame float-soft"),
         _verse(),

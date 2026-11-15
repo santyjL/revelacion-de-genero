@@ -63,5 +63,12 @@ class Settings:
             return "/baby_photo.jpg"
         return None
 
+    @property
+    def ultrasound_video_src(self) -> str | None:
+        video = self.assets_dir / "ultrasonido.mp4"
+        if video.is_file():
+            return "/ultrasonido.mp4"
+        return None
+
 
 settings = Settings()

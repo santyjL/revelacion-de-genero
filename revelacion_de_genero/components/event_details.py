@@ -30,7 +30,7 @@ def _detail(icon: str, label: str, value: str) -> rx.Component:
         rx.text(icon, font_size="1.25rem", aria_hidden="true"),
         rx.vstack(
             rx.text(label, style=LABEL, font_size="0.72rem"),
-            rx.text(value, font_family=FONTS["serif"], font_size="1.15rem", color=COLORS["sepia"]),
+            rx.text(value, font_family=FONTS["serif"], font_size="1.3rem", color=COLORS["sepia"]),
             spacing="1",
             align="start",
         ),
@@ -49,7 +49,7 @@ def event_details() -> rx.Component:
     return rx.box(
         corners(),
         rx.vstack(
-            rx.heading("Los detalles", as_="h2", font_size="clamp(1.3rem, 5vw, 1.8rem)"),
+            rx.heading("Los detalles", as_="h2", font_size="clamp(1.6rem, 5.4vw, 2.1rem)"),
             flourish(),
             _detail("📅", "Fecha", pretty_date),
             _detail("🕒", "Hora", hour_display),

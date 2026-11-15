@@ -39,7 +39,7 @@ def countdown() -> rx.Component:
         rx.heading(
             "¡ACTIVA LA CUENTA REGRESIVA Y PREPÁRATE PARA LA SORPRESA!",
             as_="h2",
-            font_size="clamp(1.15rem, 4.8vw, 1.7rem)",
+            font_size="clamp(1.45rem, 5vw, 2rem)",
         ),
         flourish(),
         rx.box(

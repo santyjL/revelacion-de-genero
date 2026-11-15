@@ -3,9 +3,9 @@
   --cream: #e8d9c3;
   --brown: #705744;
   --sepia: #46352c;
-  --rose: #d9a1a5;
-  --blue: #a9c9d8;
-  --muted-pink: #ebc6c8;
+  --rose: #c8798c;
+  --blue: #83b8d2;
+  --muted-pink: #f0bcc7;
   --sage: #a6aa91;
   --gold: #b69a6b;
   --paper: #fbf6ee;
@@ -15,8 +15,8 @@
   --font-body: "Lora", Georgia, serif;
   --font-sans: "Lato", "Segoe UI", sans-serif;
   --paper-texture:
-    radial-gradient(circle at 12% 18%, rgba(182, 154, 107, 0.09), transparent 0.9rem),
-    radial-gradient(circle at 82% 72%, rgba(166, 170, 145, 0.1), transparent 1.1rem),
+    radial-gradient(circle at 12% 18%, rgba(200, 121, 140, 0.13), transparent 0.9rem),
+    radial-gradient(circle at 82% 72%, rgba(131, 184, 210, 0.15), transparent 1.1rem),
     linear-gradient(180deg, rgba(244, 235, 221, 0.92), rgba(232, 217, 195, 0.55));
 }
 
