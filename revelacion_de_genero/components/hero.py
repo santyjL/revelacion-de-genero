@@ -14,12 +14,12 @@ def hero() -> rx.Component:
         rx.image(
             src=rx.asset("decorations/parejita-de-osos.png"),
             alt="Osita y osito celebrando juntos",
-            width="clamp(7rem, 31vw, 10rem)",
+            width="clamp(10rem, 35vw, 12rem)",
             height="auto",
             class_name="float-soft",
         ),
         rx.heading(
-            "¡UNA GRAN SORPRESA ESTÁ POR LLEGAR! 🩷🩵",
+            "¡UNA GRAN SORPRESA ESTÁ POR LLEGAR!",
             as_="h1",
             font_size="clamp(1.9rem, 7.5vw, 3.1rem)",
             style=HEADING,

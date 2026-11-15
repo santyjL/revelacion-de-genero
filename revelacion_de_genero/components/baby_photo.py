@@ -69,7 +69,13 @@ def _verse() -> rx.Component:
 
 def baby_photo() -> rx.Component:
     return rx.vstack(
-        tiny_icon("🎀"),
+        rx.image(
+            src=rx.asset("decorations/banderitas.png"),
+            alt="Osita y osito celebrando juntos",
+            width="clamp(10rem, 60vw, 20rem)",
+            height="auto",
+            class_name="float-soft",
+        ),
         rx.heading("Nuestro pequeño milagro", as_="h2", font_size="clamp(1.6rem, 5.5vw, 2.2rem)"),
         flourish(),
         rx.box(_photo(), style=PHOTO_FRAME, class_name="photo-frame float-soft"),

@@ -98,7 +98,7 @@ def team_cards() -> rx.Component:
             _card(
                 "girl",
                       "TEAM NIÑA",
-                "Si crees que será niña: Ven con una prenda en tono rosado y trae pañales Huggies Dermacare o Pampers talla P, M o G en adelante.",
+                "Si crees que será niña: Ven con una prenda en color rosado y trae pañales Huggies Natural care, Dermacare talla P, M, G o Pampers a partir de la talla 1.",
                 COLORS["sepia"],
                 TEAM_GIRL,
                 "decorations/osita.png",

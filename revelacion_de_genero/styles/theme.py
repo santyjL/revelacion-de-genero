@@ -4,7 +4,7 @@ from __future__ import annotations
 
 COLORS = {
     "ivory": "#F4EBDD",
-    "cream": "#E8D9C3",
+    "cream": "#ECC489",
     "brown": "#705744",
     "sepia": "#46352C",
     "rose": "#C8798C",
