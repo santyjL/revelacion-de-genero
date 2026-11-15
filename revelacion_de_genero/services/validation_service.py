@@ -7,7 +7,7 @@ import unicodedata
 from dataclasses import dataclass
 
 ATTENDANCE_VALUES = {"yes", "no"}
-TEAM_VALUES = {"boy", "girl", "unknown"}
+TEAM_VALUES = {"boy", "girl"}
 CONTROL_CHARS = re.compile(r"[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]")
 
 
@@ -17,7 +17,7 @@ class ValidationResult:
     message: str = ""
     name: str = ""
     attendance: str = ""
-    team: str = "unknown"
+    team: str = ""
 
 
 def sanitize_name(raw: str | None) -> str:
@@ -45,5 +45,5 @@ def validate_rsvp(name: str | None, attendance: str | None, team: str | None) ->
         return ValidationResult(False, "Confirma si podrás asistir.")
     selected_team = (team or "unknown").strip().lower()
     if selected_team not in TEAM_VALUES:
-        selected_team = "unknown"
+        return ValidationResult(False, "Elige tu equipo en una de las tarjetas.")
     return ValidationResult(True, name=cleaned, attendance=choice, team=selected_team)

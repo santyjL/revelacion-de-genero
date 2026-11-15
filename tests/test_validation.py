@@ -19,23 +19,25 @@ def test_empty_name():
 
 
 def test_spanish_characters():
-    result = validate_rsvp("José Núñez", "no", "unknown")
+    result = validate_rsvp("José Núñez", "no", "boy")
     assert result.ok
     assert result.name == "José Núñez"
     assert result.attendance == "no"
 
 
 def test_both_attendance_options():
-    assert validate_rsvp("Ana", "yes", None).ok
-    assert validate_rsvp("Ana", "no", None).ok
-    assert not validate_rsvp("Ana", "", None).ok
+    assert validate_rsvp("Ana", "yes", "boy").ok
+    assert validate_rsvp("Ana", "no", "girl").ok
+    assert not validate_rsvp("Ana", "", "boy").ok
+    assert not validate_rsvp("Ana", "yes", "").ok
 
 
 def test_each_team_selection():
-    for team in ("boy", "girl", "unknown"):
+    for team in ("boy", "girl"):
         result = validate_rsvp("Carlos Pérez", "yes", team)
         assert result.ok
         assert result.team == team
+    assert not validate_rsvp("Carlos Pérez", "yes", "unknown").ok
 
 
 def test_csv_formula_injection():

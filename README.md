@@ -15,6 +15,7 @@ Coloca la fotografía en `assets/baby_photo.jpg` cuando la tengas. El versículo
 ## Confirmaciones
 
 Las respuestas del formulario se guardan en `data/attendance.csv`. Ese archivo no se sirve como estático.
+Las invitaciones familiares guardan una fila por integrante con un `invitation_id` compartido; se permiten de 2 a 6 integrantes contando a quien responde. Los reportes cuentan personas, no invitaciones.
 
 ## Reporte diario por Gmail
 

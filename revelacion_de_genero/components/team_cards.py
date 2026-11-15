@@ -5,6 +5,7 @@ from __future__ import annotations
 import reflex as rx
 
 from revelacion_de_genero.components.ornaments import flourish
+from revelacion_de_genero.state.rsvp_state import RsvpState
 from revelacion_de_genero.styles.style import TEAM_BOY, TEAM_GIRL
 from revelacion_de_genero.styles.theme import COLORS, FONTS, SPACE
 
@@ -32,8 +33,17 @@ def _reveal() -> rx.Component:
     )
 
 
-def _card(title: str, body: str, accent: str, style: dict, bear_image: str, bear_alt: str) -> rx.Component:
-    return rx.box(
+def _card(
+    team: str,
+    title: str,
+    body: str,
+    accent: str,
+    style: dict,
+    bear_image: str,
+    bear_alt: str,
+) -> rx.Component:
+    is_selected = RsvpState.team == team
+    return rx.box(rx.button(
         rx.vstack(
             rx.image(
                 src=rx.asset(bear_image),
@@ -43,13 +53,31 @@ def _card(title: str, body: str, accent: str, style: dict, bear_image: str, bear
                 object_fit="contain",
             ),
             rx.heading(title, as_="h3", font_size="1.45rem", color=accent),
-            rx.text(body, text_align="center", font_size="1.08rem", line_height="1.55"),
+            rx.text(body, text_align="center", font_size="1.08rem", line_height="1.20"),
             spacing="3",
             align="center",
         ),
-        style=style,
+        style={
+            **style,
+            "border": rx.cond(is_selected, f"3px solid {COLORS['sepia']}", style["border"]),
+            "box_shadow": rx.cond(is_selected, "0 0.6rem 1.4rem #46352c55", style["box_shadow"]),
+        },
+        class_name=rx.cond(
+            is_selected,
+            f"team-card team-card-{team} selected",
+            f"team-card team-card-{team}",
+        ),
+        on_click=RsvpState.set_team(team),
         width="100%",
         min_height="18rem",
+        height="6rem",
+        white_space="normal",
+        cursor="pointer",
+        transition="transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease",
+        _hover={"transform": "translateY(-0.2rem)", "box_shadow": "0 0.6rem 1.4rem #46352c33"},
+    ),
+        display="flex",
+        direction="auto",
     )
 
 
@@ -59,6 +87,7 @@ def team_cards() -> rx.Component:
         rx.heading("¡Elige tu equipo!", as_="h2", font_size="clamp(1.6rem, 5.4vw, 2.1rem)", margin_top=SPACE["lg"]),
         rx.flex(
             _card(
+                "boy",
                 "TEAM NIÑO",
                 "Si crees que será niño: Ven con una prenda en tono celeste y trae pañitos húmedos.",
                 COLORS["sepia"],
@@ -67,7 +96,8 @@ def team_cards() -> rx.Component:
                 "Osito vestido de celeste para el Team Niño",
             ),
             _card(
-                "TEAM NIÑA",
+                "girl",
+                      "TEAM NIÑA",
                 "Si crees que será niña: Ven con una prenda en tono rosado y trae pañales Huggies Dermacare o Pampers talla P, M o G en adelante.",
                 COLORS["sepia"],
                 TEAM_GIRL,
