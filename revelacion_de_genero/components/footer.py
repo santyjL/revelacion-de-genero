@@ -16,6 +16,5 @@ def footer() -> rx.Component:
         rx.text("—", color=COLORS["gold"]),
         class_name="invite-section fade-up",
         padding_bottom=SPACE["xl"],
-        background_color=COLORS["ivory"],
         width="100%",
     )
