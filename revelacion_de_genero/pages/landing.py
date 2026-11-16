@@ -44,7 +44,7 @@ def landing_page() -> rx.Component:
                 class_name="landing-card-scene",
             ),
             rx.box("",
-                   margin="0.5rem",),
+                   margin="0.5rem",),   
             flourish(),
             rx.text(
                 "Toca la carta para abrir la invitación",
