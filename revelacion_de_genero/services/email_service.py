@@ -5,6 +5,8 @@ from __future__ import annotations
 import base64
 import json
 import logging
+import smtplib
+import ssl
 from datetime import datetime
 from email.message import EmailMessage
 from pathlib import Path
@@ -84,17 +86,21 @@ def _gmail_service(allow_interactive_auth: bool = True):
 
     secret = settings.google_client_secret_file
     token_path = settings.google_token_file
-    if not secret.is_file():
-        raise FileNotFoundError("Missing Google OAuth client secret file.")
     creds = None
     if token_path.is_file():
         creds = Credentials.from_authorized_user_file(str(token_path), SCOPES)
+    if creds and creds.valid:
+        return build("gmail", "v1", credentials=creds)
     if not creds or not creds.valid:
         if creds and creds.expired and creds.refresh_token:
             creds.refresh(Request())
         elif allow_interactive_auth:
+            if not secret.is_file():
+                raise FileNotFoundError("Missing Google OAuth client secret file.")
             flow = InstalledAppFlow.from_client_secrets_file(str(secret), SCOPES)
             creds = flow.run_local_server(port=0)
+        elif not secret.is_file():
+            raise FileNotFoundError("Missing Google OAuth client secret file.")
         else:
             raise RuntimeError("Gmail authorization is not configured.")
         token_path.parent.mkdir(parents=True, exist_ok=True)
@@ -118,27 +124,30 @@ def authorize_gmail() -> None:
     token_path.chmod(0o600)
 
 
-def _message_with_attachment(summary: str, csv_path: Path) -> dict[str, str]:
+def _message_with_attachment(summary: str, csv_path: Path) -> EmailMessage:
     message = EmailMessage()
-    message["To"] = settings.gmail_recipient
-    message["From"] = settings.gmail_sender
+    message["To"] = settings.email_recipient
+    message["From"] = settings.email_sender
     message["Subject"] = SUBJECT
     message.set_content(summary)
-    csv_bytes = csv_path.read_bytes()
+    _attach_attendance_csv(message, csv_path)
+    return message
+
+
+def _attach_attendance_csv(message: EmailMessage, csv_path: Path) -> None:
     message.add_attachment(
-        csv_bytes,
+        csv_path.read_bytes(),
         maintype="text",
         subtype="csv",
         filename="attendance.csv",
     )
-    raw = base64.urlsafe_b64encode(message.as_bytes()).decode("utf-8")
-    return {"raw": raw}
 
 
 def _rsvp_notification_body(records: list[dict[str, str]], generated: datetime) -> str:
     team_names = {"boy": "Team Niño", "girl": "Team Niña", "unknown": "Aún no lo sabe"}
     invitation_names = {"family": "Familiar", "individual": "Individual"}
     guest_names = "\n".join(f"- {record['name']}" for record in records)
+    attendance_names = {"yes": "Asistirá", "no": "No podrá asistir"}
     teams = ", ".join(
         sorted(
             {
@@ -149,10 +158,11 @@ def _rsvp_notification_body(records: list[dict[str, str]], generated: datetime) 
     )
     return (
         "Hola,\n\n"
-        "Se recibió una nueva confirmación afirmativa para la revelación de género.\n\n"
+        "Se recibió una nueva respuesta para la revelación de género.\n\n"
         f"Invitados:\n{guest_names}\n\n"
         f"Tipo de invitación: "
         f"{invitation_names.get(records[0]['invitation_type'], 'No especificado')}\n"
+        f"Asistencia: {attendance_names.get(records[0]['attendance'], 'No especificada')}\n"
         f"Equipo seleccionado: {teams}\n"
         f"Fecha y hora de recepción: {generated.astimezone(settings.timezone).isoformat()}\n\n"
         "Saludos."
@@ -161,33 +171,78 @@ def _rsvp_notification_body(records: list[dict[str, str]], generated: datetime) 
 
 def _message_for_rsvp_notification(
     records: list[dict[str, str]], generated: datetime
-) -> dict[str, str]:
+) -> EmailMessage:
     message = EmailMessage()
-    message["To"] = settings.gmail_recipient
-    message["From"] = settings.gmail_sender
+    message["To"] = settings.email_recipient
+    message["From"] = settings.email_sender
     message["Subject"] = "Nueva confirmación de asistencia - Revelación de género"
     message.set_content(_rsvp_notification_body(records, generated))
+    _attach_attendance_csv(message, Path(export_attendance()))
+    return message
+
+
+def _send_smtp(message: EmailMessage) -> None:
+    """Deliver an email through a configured SMTP server."""
+    if not settings.smtp_host:
+        raise RuntimeError("SMTP_HOST must be configured for SMTP delivery.")
+    if not settings.email_sender or not settings.email_recipient:
+        raise RuntimeError("EMAIL_SENDER and EMAIL_RECIPIENT must be configured.")
+    if bool(settings.smtp_username) != bool(settings.smtp_password):
+        raise RuntimeError("Configure both SMTP_USERNAME and SMTP_PASSWORD, or neither.")
+
+    security = settings.smtp_security
+    if security == "ssl":
+        connection = smtplib.SMTP_SSL(
+            settings.smtp_host,
+            settings.smtp_port,
+            timeout=30,
+            context=ssl.create_default_context(),
+        )
+    elif security == "starttls":
+        connection = smtplib.SMTP(settings.smtp_host, settings.smtp_port, timeout=30)
+    else:
+        raise ValueError("SMTP_SECURITY must be either 'starttls' or 'ssl'.")
+
+    with connection as server:
+        if security == "starttls":
+            server.ehlo()
+            server.starttls(context=ssl.create_default_context())
+            server.ehlo()
+        if settings.smtp_username:
+            server.login(settings.smtp_username, settings.smtp_password)
+        server.send_message(message)
+
+
+def _send_message(message: EmailMessage) -> None:
+    """Send via SMTP or the existing Gmail API integration."""
+    if settings.email_transport == "smtp":
+        _send_smtp(message)
+        return
+    if settings.email_transport != "gmail":
+        raise ValueError("EMAIL_TRANSPORT must be either 'smtp' or 'gmail'.")
+    if not settings.email_sender or not settings.email_recipient:
+        raise RuntimeError("EMAIL_SENDER and EMAIL_RECIPIENT must be configured.")
+
     raw = base64.urlsafe_b64encode(message.as_bytes()).decode("utf-8")
-    return {"raw": raw}
+    service = _gmail_service(allow_interactive_auth=False)
+    service.users().messages().send(userId="me", body={"raw": raw}).execute()
 
 
 def send_rsvp_notification(
     records: list[dict[str, str]], now: datetime | None = None
 ) -> dict[str, Any]:
-    """Notify the configured recipient about an affirmative RSVP."""
+    """Notify the configured recipient about a saved RSVP."""
     generated = now or datetime.now(settings.timezone)
     result: dict[str, Any] = {"sent": False}
     try:
-        if not settings.gmail_sender or not settings.gmail_recipient:
-            raise RuntimeError("Gmail sender and recipient must be configured.")
-        if not records or any(record.get("attendance") != "yes" for record in records):
-            raise ValueError("RSVP notification requires affirmative attendance records.")
-        service = _gmail_service(allow_interactive_auth=False)
-        body = _message_for_rsvp_notification(records, generated)
-        service.users().messages().send(userId="me", body=body).execute()
+        attendance_values = {record.get("attendance") for record in records}
+        if not records or len(attendance_values) != 1 or not attendance_values <= {"yes", "no"}:
+            raise ValueError("RSVP notification requires one consistent attendance response.")
+        message = _message_for_rsvp_notification(records, generated)
+        _send_message(message)
         result["sent"] = True
     except Exception as exc:  # noqa: BLE001 — save is independent; keep failures visible in logs
-        logger.exception("Immediate RSVP Gmail notification failed")
+        logger.exception("Immediate RSVP email notification failed")
         result["error"] = type(exc).__name__
     return result
 
@@ -215,11 +270,13 @@ def send_daily_report(
         result["dry_run"] = True
         return result
     try:
-        if client_secret_file is not None and not client_secret_file.is_file():
+        if (
+            settings.email_transport == "gmail"
+            and client_secret_file is not None
+            and not client_secret_file.is_file()
+        ):
             raise FileNotFoundError("Missing Google OAuth client secret file.")
-        service = _gmail_service()
-        body = _message_with_attachment(summary, attachment)
-        service.users().messages().send(userId="me", body=body).execute()
+        _send_message(_message_with_attachment(summary, attachment))
         register_delivery(
             day_key,
             "sent",
@@ -229,7 +286,7 @@ def send_daily_report(
         result["sent"] = True
         return result
     except Exception as exc:  # noqa: BLE001 — log and keep CSV intact
-        logger.exception("Gmail delivery failed")
+        logger.exception("Attendance report email delivery failed")
         register_delivery(
             day_key,
             "failed",

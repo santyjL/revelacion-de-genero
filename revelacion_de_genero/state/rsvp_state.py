@@ -146,11 +146,7 @@ class RsvpState(rx.State):
             self.submitting = False
             return
         self.success_message = YES_MESSAGE if results[0].attendance == "yes" else NO_MESSAGE
-        self.notification_message = (
-            "Enviando aviso a los organizadores..."
-            if results[0].attendance == "yes"
-            else ""
-        )
+        self.notification_message = "Enviando aviso a los organizadores..."
         self.submitted = True
         self.guest_name = ""
         self.family_member_2 = ""
@@ -162,12 +158,11 @@ class RsvpState(rx.State):
         self.invitation_type = "individual"
         self.attendance = ""
         self.submitting = False
-        if results[0].attendance == "yes":
-            return RsvpState.send_confirmation_notification(records)
+        return RsvpState.send_confirmation_notification(records)
 
     @rx.event(background=True)
     async def send_confirmation_notification(self, records: list[dict[str, str]]):
-        """Send an affirmative RSVP notification without blocking the form."""
+        """Send an RSVP notification without blocking the form."""
         result = await asyncio.to_thread(send_rsvp_notification, records)
         async with self:
             if result["sent"]:

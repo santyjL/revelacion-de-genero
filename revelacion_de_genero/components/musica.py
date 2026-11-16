@@ -8,14 +8,14 @@ from revelacion_de_genero.styles.theme import COLORS, FONTS, SHADOWS
 
 
 def musica() -> rx.Component:
-    """Render the invitation song and start playback when the page loads."""
+    """Render the invitation song with playback controlled by the visitor."""
     return rx.box(
         rx.vstack(
             rx.hstack(
                 rx.icon("music-2", size=28, color=COLORS["rose"], aria_hidden="true"),
                 rx.audio(
                     src=rx.asset("Chiquita-Camilo-music.mp3"),
-                    playing=True,
+                    playing=False,
                     controls=True,
                     loop=True,
                     volume=0.65,

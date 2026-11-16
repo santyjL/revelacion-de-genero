@@ -4,3 +4,10 @@ __pycache__/
 *.pyc
 .git/
 .env
+.env.*
+!.env.example
+credentials/
+data/attendance.csv
+data/email_log.json
+.pytest_cache/
+.reflex/

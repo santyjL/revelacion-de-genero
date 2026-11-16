@@ -32,10 +32,22 @@ class Settings:
     event_time: time = time.fromisoformat(_env("EVENT_TIME", "15:00:00"))
     event_place: str = _env("EVENT_PLACE", "Restaurante Pikito's")
     report_end_date: date = date.fromisoformat(_env("REPORT_END_DATE", "2026-11-22"))
-    data_dir: Path = PROJECT_ROOT / "data"
-    attendance_csv: Path = PROJECT_ROOT / "data" / "attendance.csv"
-    email_log_path: Path = PROJECT_ROOT / "data" / "email_log.json"
+    data_dir: Path = _configured_path("DATA_DIR", PROJECT_ROOT / "data")
+    attendance_csv: Path = _configured_path(
+        "ATTENDANCE_CSV", data_dir / "attendance.csv"
+    )
+    email_log_path: Path = _configured_path(
+        "EMAIL_LOG_PATH", data_dir / "email_log.json"
+    )
     credentials_dir: Path = PROJECT_ROOT / "credentials"
+    email_transport: str = _env("EMAIL_TRANSPORT", "gmail").lower()
+    email_sender: str = _env("EMAIL_SENDER", _env("GMAIL_SENDER"))
+    email_recipient: str = _env("EMAIL_RECIPIENT", _env("GMAIL_RECIPIENT"))
+    smtp_host: str = _env("SMTP_HOST")
+    smtp_port: int = int(_env("SMTP_PORT", "587"))
+    smtp_security: str = _env("SMTP_SECURITY", "starttls").lower()
+    smtp_username: str = _env("SMTP_USERNAME")
+    smtp_password: str = _env("SMTP_PASSWORD")
     gmail_sender: str = _env("GMAIL_SENDER")
     gmail_recipient: str = _env("GMAIL_RECIPIENT")
     google_client_secret_file: Path = _configured_path(
