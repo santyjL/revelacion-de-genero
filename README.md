@@ -19,10 +19,22 @@ Las invitaciones familiares guardan una fila por integrante con un `invitation_i
 
 ## Reporte diario por Gmail
 
-1. Copia `.env.example` a `.env` y completa remitente, destinatario y rutas OAuth.
-2. Coloca `credentials/client_secret.json` (no se versiona).
-3. La primera ejecución de `python -m scripts.send_daily_report` abre el flujo OAuth y guarda `credentials/token.json`.
-4. Programa cron en `America/Managua` hasta el 22 de noviembre de 2026:
+Configura `GMAIL_SENDER`, `GMAIL_RECIPIENT`, `GOOGLE_CLIENT_SECRET_FILE` y
+`GOOGLE_TOKEN_FILE` en `.env`. Los archivos OAuth deben permanecer en `credentials/`,
+que no se versiona.
+
+Autoriza Gmail una sola vez desde un equipo que pueda abrir el navegador:
+
+```bash
+python -m scripts.authorize_gmail
+```
+
+El comando abre el consentimiento OAuth y guarda el token local sin enviar correos.
+El envío de una notificación afirmativa desde el formulario usa ese token y se
+ejecuta en segundo plano. Los fallos se registran en el log del servidor; la
+confirmación permanece guardada en el CSV.
+
+Programa los reportes diarios en `America/Managua` hasta el 22 de noviembre de 2026:
 
 ```cron
 0 20 * * * cd /ruta/al/proyecto && .venv/bin/python -m scripts.send_daily_report

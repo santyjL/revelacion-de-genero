@@ -76,7 +76,7 @@ def build_report_summary(now: datetime | None = None, csv_path: Path | None = No
     )
 
 
-def _gmail_service():
+def _gmail_service(allow_interactive_auth: bool = True):
     from google.auth.transport.requests import Request
     from google.oauth2.credentials import Credentials
     from google_auth_oauthlib.flow import InstalledAppFlow
@@ -92,12 +92,30 @@ def _gmail_service():
     if not creds or not creds.valid:
         if creds and creds.expired and creds.refresh_token:
             creds.refresh(Request())
-        else:
+        elif allow_interactive_auth:
             flow = InstalledAppFlow.from_client_secrets_file(str(secret), SCOPES)
             creds = flow.run_local_server(port=0)
+        else:
+            raise RuntimeError("Gmail authorization is not configured.")
         token_path.parent.mkdir(parents=True, exist_ok=True)
         token_path.write_text(creds.to_json(), encoding="utf-8")
+        token_path.chmod(0o600)
     return build("gmail", "v1", credentials=creds)
+
+
+def authorize_gmail() -> None:
+    """Run the one-time local OAuth consent flow without sending an email."""
+    from google_auth_oauthlib.flow import InstalledAppFlow
+
+    secret = settings.google_client_secret_file
+    if not secret.is_file():
+        raise FileNotFoundError("Missing Google OAuth client secret file.")
+    flow = InstalledAppFlow.from_client_secrets_file(str(secret), SCOPES)
+    credentials = flow.run_local_server(port=0)
+    token_path = settings.google_token_file
+    token_path.parent.mkdir(parents=True, exist_ok=True)
+    token_path.write_text(credentials.to_json(), encoding="utf-8")
+    token_path.chmod(0o600)
 
 
 def _message_with_attachment(summary: str, csv_path: Path) -> dict[str, str]:
@@ -115,6 +133,63 @@ def _message_with_attachment(summary: str, csv_path: Path) -> dict[str, str]:
     )
     raw = base64.urlsafe_b64encode(message.as_bytes()).decode("utf-8")
     return {"raw": raw}
+
+
+def _rsvp_notification_body(records: list[dict[str, str]], generated: datetime) -> str:
+    team_names = {"boy": "Team Niño", "girl": "Team Niña", "unknown": "Aún no lo sabe"}
+    invitation_names = {"family": "Familiar", "individual": "Individual"}
+    guest_names = "\n".join(f"- {record['name']}" for record in records)
+    teams = ", ".join(
+        sorted(
+            {
+                team_names.get(record["team"], "Sin equipo seleccionado")
+                for record in records
+            }
+        )
+    )
+    return (
+        "Hola,\n\n"
+        "Se recibió una nueva confirmación afirmativa para la revelación de género.\n\n"
+        f"Invitados:\n{guest_names}\n\n"
+        f"Tipo de invitación: "
+        f"{invitation_names.get(records[0]['invitation_type'], 'No especificado')}\n"
+        f"Equipo seleccionado: {teams}\n"
+        f"Fecha y hora de recepción: {generated.astimezone(settings.timezone).isoformat()}\n\n"
+        "Saludos."
+    )
+
+
+def _message_for_rsvp_notification(
+    records: list[dict[str, str]], generated: datetime
+) -> dict[str, str]:
+    message = EmailMessage()
+    message["To"] = settings.gmail_recipient
+    message["From"] = settings.gmail_sender
+    message["Subject"] = "Nueva confirmación de asistencia - Revelación de género"
+    message.set_content(_rsvp_notification_body(records, generated))
+    raw = base64.urlsafe_b64encode(message.as_bytes()).decode("utf-8")
+    return {"raw": raw}
+
+
+def send_rsvp_notification(
+    records: list[dict[str, str]], now: datetime | None = None
+) -> dict[str, Any]:
+    """Notify the configured recipient about an affirmative RSVP."""
+    generated = now or datetime.now(settings.timezone)
+    result: dict[str, Any] = {"sent": False}
+    try:
+        if not settings.gmail_sender or not settings.gmail_recipient:
+            raise RuntimeError("Gmail sender and recipient must be configured.")
+        if not records or any(record.get("attendance") != "yes" for record in records):
+            raise ValueError("RSVP notification requires affirmative attendance records.")
+        service = _gmail_service(allow_interactive_auth=False)
+        body = _message_for_rsvp_notification(records, generated)
+        service.users().messages().send(userId="me", body=body).execute()
+        result["sent"] = True
+    except Exception as exc:  # noqa: BLE001 — save is independent; keep failures visible in logs
+        logger.exception("Immediate RSVP Gmail notification failed")
+        result["error"] = type(exc).__name__
+    return result
 
 
 def send_daily_report(

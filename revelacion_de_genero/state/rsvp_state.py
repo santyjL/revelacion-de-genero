@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import asyncio
 from datetime import datetime
 from uuid import uuid4
 
@@ -9,6 +10,7 @@ import reflex as rx
 
 from revelacion_de_genero.config.settings import settings
 from revelacion_de_genero.services.csv_service import recent_duplicate, save_attendance_batch
+from revelacion_de_genero.services.email_service import send_rsvp_notification
 from revelacion_de_genero.services.validation_service import validate_rsvp
 
 YES_MESSAGE = "¡Qué alegría! Te esperamos para descubrir juntos la sorpresa."
@@ -30,6 +32,7 @@ class RsvpState(rx.State):
     team: str = ""
     error_message: str = ""
     success_message: str = ""
+    notification_message: str = ""
     submitting: bool = False
     submitted: bool = False
 
@@ -143,6 +146,11 @@ class RsvpState(rx.State):
             self.submitting = False
             return
         self.success_message = YES_MESSAGE if results[0].attendance == "yes" else NO_MESSAGE
+        self.notification_message = (
+            "Enviando aviso a los organizadores..."
+            if results[0].attendance == "yes"
+            else ""
+        )
         self.submitted = True
         self.guest_name = ""
         self.family_member_2 = ""
@@ -154,3 +162,18 @@ class RsvpState(rx.State):
         self.invitation_type = "individual"
         self.attendance = ""
         self.submitting = False
+        if results[0].attendance == "yes":
+            return RsvpState.send_confirmation_notification(records)
+
+    @rx.event(background=True)
+    async def send_confirmation_notification(self, records: list[dict[str, str]]):
+        """Send an affirmative RSVP notification without blocking the form."""
+        result = await asyncio.to_thread(send_rsvp_notification, records)
+        async with self:
+            if result["sent"]:
+                self.notification_message = "Aviso enviado a los organizadores."
+            else:
+                self.notification_message = (
+                    "Tu respuesta quedó guardada, pero no se pudo enviar el aviso a los "
+                    "organizadores. Por favor, avísales directamente."
+                )

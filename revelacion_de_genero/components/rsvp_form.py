@@ -74,7 +74,26 @@ def rsvp_form() -> rx.Component:
             rx.text("¡Queremos contar contigo en este día tan especial!"),
             rx.cond(
                 RsvpState.submitted,
-                rx.text(RsvpState.success_message, text_align="center", color=COLORS["sepia"]),
+                rx.vstack(
+                    rx.text(
+                        RsvpState.success_message,
+                        text_align="center",
+                        color=COLORS["sepia"],
+                    ),
+                    rx.cond(
+                        RsvpState.notification_message != "",
+                        rx.text(
+                            RsvpState.notification_message,
+                            text_align="center",
+                            color=COLORS["brown"],
+                            font_size="0.95rem",
+                        ),
+                        rx.fragment(),
+                    ),
+                    width="100%",
+                    spacing="2",
+                    align="center",
+                ),
                 rx.form(
                     rx.vstack(
                         rx.text("¿Podrás asistir?", style=LABEL, text_align="center"),

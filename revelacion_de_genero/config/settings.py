@@ -18,6 +18,11 @@ def _env(name: str, default: str = "") -> str:
     return os.getenv(name, default).strip()
 
 
+def _configured_path(name: str, default: Path) -> Path:
+    value = Path(_env(name, str(default)))
+    return value if value.is_absolute() else PROJECT_ROOT / value
+
+
 @dataclass(frozen=True)
 class Settings:
     """Runtime configuration for the invitation, RSVP storage and reports."""
@@ -33,11 +38,13 @@ class Settings:
     credentials_dir: Path = PROJECT_ROOT / "credentials"
     gmail_sender: str = _env("GMAIL_SENDER")
     gmail_recipient: str = _env("GMAIL_RECIPIENT")
-    google_client_secret_file: Path = Path(
-        _env("GOOGLE_CLIENT_SECRET_FILE", str(PROJECT_ROOT / "credentials" / "client_secret.json"))
+    google_client_secret_file: Path = _configured_path(
+        "GOOGLE_CLIENT_SECRET_FILE",
+        PROJECT_ROOT / "credentials" / "client_secret.json",
     )
-    google_token_file: Path = Path(
-        _env("GOOGLE_TOKEN_FILE", str(PROJECT_ROOT / "credentials" / "token.json"))
+    google_token_file: Path = _configured_path(
+        "GOOGLE_TOKEN_FILE",
+        PROJECT_ROOT / "credentials" / "token.json",
     )
     bible_verse_text: str = _env("BIBLE_VERSE_TEXT")
     bible_verse_reference: str = _env("BIBLE_VERSE_REFERENCE")
