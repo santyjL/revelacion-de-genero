@@ -38,7 +38,7 @@ EMAIL_LOG_PATH=/revelacion_de_genero/data/email_log.json
 
 Para un servidor SMTP con SSL implícito (normalmente puerto 465), usa `SMTP_SECURITY=ssl`. No uses conexiones SMTP sin cifrar. Guarda las credenciales como secretos del proveedor de despliegue; no las añadas a Git ni a la imagen. Si se usa un servidor autohospedado, configura también DNS y reputación del dominio (SPF, DKIM y DMARC) para mejorar la entrega.
 
-Gmail API sigue disponible como alternativa. Configura `EMAIL_TRANSPORT=gmail`, `GMAIL_SENDER`, `GMAIL_RECIPIENT`, `GOOGLE_CLIENT_SECRET_FILE` y `GOOGLE_TOKEN_FILE`. Autoriza la cuenta una sola vez en un equipo con navegador mediante `python -m scripts.authorize_gmail`, y provisiona el token OAuth como secreto persistente en producción. El error `Missing Google OAuth client secret file` significa que el contenedor no encuentra el archivo de credenciales en la ruta configurada; el archivo local del repositorio no se incluye en la imagen por seguridad.
+Gmail API sigue disponible como alternativa. Configura `EMAIL_TRANSPORT=gmail`, `GMAIL_SENDER` y `GMAIL_RECIPIENT`. En producción puedes usar `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` y `GMAIL_REFRESH_TOKEN` directamente como variables secretas del entorno, sin archivo OAuth ni archivo de token. Si las variables de ID o secreto no están definidas, el servicio puede obtener esos valores del token OAuth guardado. También se admite el flujo anterior con `GOOGLE_CLIENT_SECRET_FILE` y `GOOGLE_TOKEN_FILE`. Nunca incluyas esos valores en logs o en el control de versiones; el ejemplo está en [.env.example](./.env.example).
 
 El ejemplo completo de variables está en [.env.example](./.env.example). Nunca copies el `.env`, el CSV o los secretos OAuth dentro de la imagen.
 

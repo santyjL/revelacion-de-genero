@@ -86,26 +86,67 @@ def _gmail_service(allow_interactive_auth: bool = True):
 
     secret = settings.google_client_secret_file
     token_path = settings.google_token_file
-    creds = None
+    stored_creds = None
     if token_path.is_file():
-        creds = Credentials.from_authorized_user_file(str(token_path), SCOPES)
+        stored_creds = Credentials.from_authorized_user_file(str(token_path), SCOPES)
+
+    refresh_token = settings.gmail_refresh_token or (
+        stored_creds.refresh_token if stored_creds else None
+    )
+    client_id = settings.google_client_id or (
+        stored_creds.client_id if stored_creds else None
+    )
+    client_secret = settings.google_client_secret or (
+        stored_creds.client_secret if stored_creds else None
+    )
+    use_environment_refresh_token = bool(settings.gmail_refresh_token)
+
+    if refresh_token and client_id and client_secret:
+        reuse_stored_token = bool(
+            stored_creds
+            and stored_creds.refresh_token == refresh_token
+            and stored_creds.client_id == client_id
+            and stored_creds.client_secret == client_secret
+        )
+        creds = Credentials(
+            token=stored_creds.token if reuse_stored_token else None,
+            refresh_token=refresh_token,
+            token_uri=(
+                stored_creds.token_uri
+                if stored_creds
+                else "https://oauth2.googleapis.com/token"
+            ),
+            client_id=client_id,
+            client_secret=client_secret,
+            scopes=SCOPES,
+            expiry=stored_creds.expiry if reuse_stored_token else None,
+        )
+    else:
+        creds = stored_creds
+
     if creds and creds.valid:
         return build("gmail", "v1", credentials=creds)
-    if not creds or not creds.valid:
-        if creds and creds.expired and creds.refresh_token:
-            creds.refresh(Request())
-        elif allow_interactive_auth:
-            if not secret.is_file():
-                raise FileNotFoundError("Missing Google OAuth client secret file.")
-            flow = InstalledAppFlow.from_client_secrets_file(str(secret), SCOPES)
-            creds = flow.run_local_server(port=0)
-        elif not secret.is_file():
-            raise FileNotFoundError("Missing Google OAuth client secret file.")
-        else:
-            raise RuntimeError("Gmail authorization is not configured.")
+    if creds and creds.refresh_token and (creds.expired or not creds.token):
+        creds.refresh(Request())
+        if not use_environment_refresh_token:
+            token_path.parent.mkdir(parents=True, exist_ok=True)
+            token_path.write_text(creds.to_json(), encoding="utf-8")
+            token_path.chmod(0o600)
+    elif allow_interactive_auth and secret.is_file():
+        flow = InstalledAppFlow.from_client_secrets_file(str(secret), SCOPES)
+        creds = flow.run_local_server(port=0)
         token_path.parent.mkdir(parents=True, exist_ok=True)
         token_path.write_text(creds.to_json(), encoding="utf-8")
         token_path.chmod(0o600)
+    elif settings.gmail_refresh_token and not (client_id and client_secret):
+        raise RuntimeError(
+            "GMAIL_REFRESH_TOKEN requires GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET "
+            "when the token file does not contain client metadata."
+        )
+    elif not secret.is_file():
+        raise FileNotFoundError("Missing Google OAuth client secret file.")
+    else:
+        raise RuntimeError("Gmail authorization is not configured.")
     return build("gmail", "v1", credentials=creds)
 
 

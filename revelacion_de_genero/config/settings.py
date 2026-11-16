@@ -50,6 +50,9 @@ class Settings:
     smtp_password: str = _env("SMTP_PASSWORD")
     gmail_sender: str = _env("GMAIL_SENDER")
     gmail_recipient: str = _env("GMAIL_RECIPIENT")
+    google_client_id: str = _env("GOOGLE_CLIENT_ID")
+    google_client_secret: str = _env("GOOGLE_CLIENT_SECRET")
+    gmail_refresh_token: str = _env("GMAIL_REFRESH_TOKEN")
     google_client_secret_file: Path = _configured_path(
         "GOOGLE_CLIENT_SECRET_FILE",
         PROJECT_ROOT / "credentials" / "client_secret.json",

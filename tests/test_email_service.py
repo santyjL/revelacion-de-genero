@@ -1,9 +1,12 @@
 import base64
 from email import message_from_bytes, policy
-from datetime import datetime
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from types import SimpleNamespace
 from zoneinfo import ZoneInfo
+
+import google.oauth2.credentials
+import googleapiclient.discovery
 
 from revelacion_de_genero.services.countdown_service import is_report_date_active
 from revelacion_de_genero.services.csv_service import save_attendance
@@ -51,6 +54,34 @@ def test_failed_delivery_does_not_claim_success(tmp_path: Path):
     assert result["sent"] is False
     assert result["error"] == "FileNotFoundError"
     assert csv_path.exists()
+
+
+def test_gmail_refresh_token_from_environment_needs_no_oauth_files(
+    monkeypatch, tmp_path: Path
+):
+    settings = SimpleNamespace(
+        gmail_refresh_token="refresh-token-from-env",
+        google_client_id="client-id-from-env",
+        google_client_secret="client-secret-from-env",
+        google_client_secret_file=tmp_path / "missing-client.json",
+        google_token_file=tmp_path / "missing-token.json",
+    )
+    service = object()
+    monkeypatch.setattr(email_service, "settings", settings)
+
+    def refresh(credentials, _request):
+        credentials.token = "access-token"
+        credentials.expiry = datetime.now(timezone.utc) + timedelta(hours=1)
+
+    monkeypatch.setattr(google.oauth2.credentials.Credentials, "refresh", refresh)
+    monkeypatch.setattr(
+        googleapiclient.discovery,
+        "build",
+        lambda api, version, credentials: service,
+    )
+
+    assert email_service._gmail_service(allow_interactive_auth=False) is service
+    assert not settings.google_token_file.exists()
 
 
 def test_rsvp_notification_attaches_csv_for_configured_recipient(monkeypatch, tmp_path: Path):
