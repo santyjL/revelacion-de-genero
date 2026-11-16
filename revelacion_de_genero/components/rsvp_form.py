@@ -69,7 +69,7 @@ def rsvp_form() -> rx.Component:
     return rx.box(
         corners(),
         rx.vstack(
-            rx.heading("CONFIRMAR ASISTENCIA 🩷🩵", as_="h2", font_size="clamp(1.25rem, 5vw, 1.8rem)"),
+            rx.heading("CONFIRMAR ASISTENCIA", as_="h2", font_size="clamp(1.25rem, 5vw, 1.8rem)"),
             flourish(),
             rx.text("¡Queremos contar contigo en este día tan especial!"),
             rx.cond(

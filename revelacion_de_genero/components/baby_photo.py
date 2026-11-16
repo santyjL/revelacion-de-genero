@@ -43,21 +43,25 @@ def _verse() -> rx.Component:
     if settings.bible_verse_text and settings.bible_verse_reference:
         return rx.vstack(
             rx.text(
-                settings.bible_verse_text,
+                f'"{settings.bible_verse_text}"',
                 font_family=FONTS["display"],
                 font_style="italic",
+                font_size="1.8rem",
+                text_wrap="pretty",
                 color=COLORS["sepia"],
                 text_align="center",
             ),
+        
             rx.text(
                 settings.bible_verse_reference,
                 font_family=FONTS["sans"],
-                font_size="0.85rem",
+                font_size="1.3rem",
+                text_align="right",
                 letter_spacing="0.08em",
                 color=COLORS["gold"],
             ),
             spacing="2",
-            align="center",
+            align="end",
         )
     return rx.text(
         "Versículo por confirmar",
@@ -70,13 +74,20 @@ def _verse() -> rx.Component:
 def baby_photo() -> rx.Component:
     return rx.vstack(
         rx.image(
-            src=rx.asset("decorations/banderitas.png"),
+            src=rx.asset("decorations/estrellas.png"),
             alt="Osita y osito celebrando juntos",
             width="clamp(10rem, 60vw, 20rem)",
             height="auto",
             class_name="float-soft",
         ),
-        rx.heading("Nuestro pequeño milagro", as_="h2", font_size="clamp(1.6rem, 5.5vw, 2.2rem)"),
+        rx.heading(
+            "Nuestro pequeño milagro",
+            as_="h2",
+            font_size="clamp(2.8rem, 6.8vw, 3rem)",
+            text_align="center",
+            font_family=FONTS["script"],
+            color=COLORS["gold"],
+        ),
         flourish(),
         rx.box(_photo(), style=PHOTO_FRAME, class_name="photo-frame float-soft"),
         _verse(),

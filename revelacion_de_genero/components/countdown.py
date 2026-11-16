@@ -52,25 +52,13 @@ def countdown() -> rx.Component:
                 width="100%",
                 custom_attrs={"data-countdown-live": "true"},
             ),
-            rx.center(
-                rx.text(
-                    "¡Llegó el gran día! La sorpresa está por revelarse.",
-                    font_family=FONTS["script"],
-                    font_size="clamp(1.4rem, 5vw, 2rem)",
-                    color=COLORS["gold"],
-                    text_align="center",
-                ),
-                custom_attrs={"data-countdown-done": "true"},
-                display="none",
-                width="100%",
-                min_height="6rem",
-            ),
+            
             id="event-countdown",
             custom_attrs={"data-deadline-ms": str(settings.event_deadline_ms)},
             width="100%",
         ),
         rx.script(src="/countdown.js"),
         class_name="invite-section fade-up",
-        spacing="4",
+        margin=0,
         width="100%",
     )

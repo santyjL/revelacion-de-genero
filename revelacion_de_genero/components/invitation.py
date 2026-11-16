@@ -1,3 +1,4 @@
+
 """Invitation letter copy."""
 
 from __future__ import annotations
@@ -7,7 +8,6 @@ import reflex as rx
 from revelacion_de_genero.components.ornaments import corners
 from revelacion_de_genero.styles.style import BODY_TEXT
 from revelacion_de_genero.styles.theme import FONTS, SPACE
-
 
 
 def invitation() -> rx.Component:
@@ -40,12 +40,10 @@ def invitation() -> rx.Component:
         class_name="invite-panel fade-up",
         margin_top=SPACE["md"],
         font_family=FONTS["body"],
-        background_image=f"url('{carta_bg}')",
-        background_size="full",
-        background_position="center",
-        background_repeat="no-repeat",
+        background=f"center / 100% 100% no-repeat url('{carta_bg}')",
+        background_color="#F4EBDD",
         width="100%",
+        min_height="300px",
         padding=["2rem 1.5rem", "3rem 3rem"],
         box_sizing="border-box",
     )
-

@@ -16,6 +16,7 @@ def _reveal() -> rx.Component:
             "¡Estamos a punto de descubrir si nuestro pequeño milagro será NIÑA o NIÑO!",
             as_="h2",
             font_size="clamp(1.55rem, 5.8vw, 2.15rem)",
+            margin_top="0"
         ),
         flourish(),
         rx.text("Un día lleno de alegría, amor y mucha ilusión nos espera."),
@@ -27,7 +28,6 @@ def _reveal() -> rx.Component:
             color=COLORS["sepia"],
             margin_top="0.75rem",
         ),
-        spacing="3",
         align="center",
         width="100%",
     )
@@ -84,12 +84,12 @@ def _card(
 def team_cards() -> rx.Component:
     return rx.vstack(
         _reveal(),
-        rx.heading("¡Elige tu equipo!", as_="h2", font_size="clamp(1.6rem, 5.4vw, 2.1rem)", margin_top=SPACE["lg"]),
+        rx.heading("¡Elige tu equipo!", as_="h2", font_size="clamp(1.6rem, 5.4vw, 2.1rem)", margin_top=SPACE["xs"]),
         rx.flex(
             _card(
                 "boy",
                 "TEAM NIÑO",
-                "Si crees que será niño: Ven con una prenda en tono celeste y trae pañitos húmedos.",
+                "Si crees que será niño: Ven con una prenda en tono celeste y trae pañitos húmedos Huggies o Pampers.",
                 COLORS["sepia"],
                 TEAM_BOY,
                 "decorations/oso-niño.png",
@@ -112,6 +112,7 @@ def team_cards() -> rx.Component:
             "¡Elige tu equipo, ven preparado y acompáñanos a descubrir si acertaste!",
             font_family=FONTS["display"],
             font_style="italic",
+            font_size="clamp(1.6rem, 7vw, 1.9rem)",
             text_align="center",
         ),
         class_name="invite-section fade-up",

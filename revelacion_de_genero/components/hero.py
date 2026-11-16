@@ -25,14 +25,14 @@ def hero() -> rx.Component:
             style=HEADING,
         ),
         flourish(),
-        rx.text(
-            "Una invitación de familia",
-            class_name="script-text",
-            font_size="clamp(1.45rem, 5vw, 2rem)",
-            font_family=FONTS["script"],
-            color=COLORS["gold"],
+        rx.image(
+            src=rx.asset("decorations/bloques-de-juguete.png"),
+            alt="Osita y osito celebrando juntos",
+            width="clamp(10rem, 35vw, 12rem)",
+            height="auto",
+            class_name="float-soft",
         ),
         class_name="invite-section fade-up",
         padding_top=SPACE["xl"],
-        width="100%",
+        width="80%",
     )
