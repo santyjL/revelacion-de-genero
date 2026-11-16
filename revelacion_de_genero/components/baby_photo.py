@@ -4,7 +4,8 @@ from __future__ import annotations
 
 import reflex as rx
 
-from revelacion_de_genero.components.ornaments import flourish, tiny_icon
+from revelacion_de_genero.components.ornaments import flourish
+from revelacion_de_genero.components.musica import musica
 from revelacion_de_genero.config.settings import settings
 from revelacion_de_genero.styles.style import PHOTO_FRAME
 from revelacion_de_genero.styles.theme import COLORS, FONTS, SPACE
@@ -89,6 +90,7 @@ def baby_photo() -> rx.Component:
             color=COLORS["gold"],
         ),
         flourish(),
+        musica(),
         rx.box(_photo(), style=PHOTO_FRAME, class_name="photo-frame float-soft"),
         _verse(),
         class_name="invite-section fade-up",

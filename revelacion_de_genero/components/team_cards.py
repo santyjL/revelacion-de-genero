@@ -109,7 +109,7 @@ def team_cards() -> rx.Component:
             width="100%",
         ),
         rx.text(
-            "¡Elige tu equipo, ven preparado y acompáñanos a descubrir si acertaste!",
+            "Ven preparado y acompáñanos a descubrir si acertaste!",
             font_family=FONTS["display"],
             font_style="italic",
             font_size="clamp(1.6rem, 7vw, 1.9rem)",
