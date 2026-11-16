@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import reflex as rx
 
+from revelacion_de_genero.pages.landing import landing_page
 from revelacion_de_genero.pages.home import home_page
 from revelacion_de_genero.styles.style import BASE_STYLE, STYLESHEETS
 
@@ -18,8 +19,14 @@ app = rx.App(
 )
 
 app.add_page(
-    home_page,
+    landing_page,
     route="/",
+    title="Revelación de género",
+    description="Un hermoso bebé viene en camino.",
+)
+app.add_page(
+    home_page,
+    route="/invitacion",
     title="Revelación de género",
     description="Invitación digital para descubrir juntos si llega un niño o una niña.",
 )

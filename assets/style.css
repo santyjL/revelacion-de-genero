@@ -137,11 +137,119 @@ body {
   font-size: clamp(1.6rem, 6vw, 2.4rem);
 }
 
+.landing-page {
+  display: grid;
+  min-height: 100dvh;
+  place-items: center;
+  overflow: hidden;
+  padding: clamp(2rem, 6vw, 4rem) 1rem;
+  background:
+    radial-gradient(circle at 15% 18%, rgba(217, 161, 165, 0.18), transparent 12rem),
+    radial-gradient(circle at 84% 78%, rgba(169, 201, 216, 0.2), transparent 14rem),
+    var(--paper-texture);
+}
+
+.landing-title {
+  margin: 0;
+  color: var(--sepia);
+  font-family: var(--font-serif);
+  font-size: clamp(2.6rem, 9vw, 5.2rem);
+  line-height: 1.08;
+  text-align: center;
+  text-wrap: balance;
+  text-shadow: 0 2px 0 rgba(255, 253, 248, 0.75);
+}
+
+.landing-subtitle {
+  margin: 0.85rem 0 clamp(3rem, 8vw, 5rem);
+  color: var(--rose);
+  font-family: var(--font-script);
+  font-size: clamp(2rem, 6vw, 3.2rem);
+  line-height: 1.25;
+  text-align: center;
+  text-wrap: balance;
+}
+
+.landing-card-scene {
+  position: relative;
+  width: min(78vw, 43rem);
+  aspect-ratio: 3 / 2;
+  isolation: isolate;
+}
+
+.landing-letter-link {
+  position: relative;
+  z-index: 1;
+  display: block;
+  width: 100%;
+  border-radius: 0.65rem;
+  box-shadow: 0 1.2rem 2.8rem rgba(70, 53, 44, 0.2);
+  transition: transform 220ms ease, box-shadow 220ms ease;
+}
+
+.landing-letter-link:hover {
+  transform: translateY(-0.3rem) scale(1.015);
+  box-shadow: 0 1.6rem 3.2rem rgba(70, 53, 44, 0.25);
+}
+
+.landing-letter-link:focus-visible {
+  outline: 3px solid var(--rose);
+  outline-offset: 6px;
+}
+
+.landing-letter {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: inherit;
+}
+
+.landing-bear {
+  position: absolute;
+  z-index: 2;
+  height: auto;
+  object-fit: contain;
+  pointer-events: none;
+  filter: drop-shadow(0 0.45rem 0.6rem rgba(70, 53, 44, 0.16));
+}
+
+.landing-bear-girl {
+  top: -13%;
+  left: -12%;
+  width: clamp(6rem, 22vw, 11rem);
+}
+
+.landing-bear-boy {
+  right: -10%;
+  bottom: -14%;
+  width: clamp(6.5rem, 23vw, 11.5rem);
+}
+
 @media (prefers-reduced-motion: reduce) {
   .fade-up,
   .float-soft,
   .pulse-soft,
-  .gold-shimmer {
+  .gold-shimmer,
+  .landing-letter-link {
     animation: none !important;
+    transition: none !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .landing-card-scene {
+    width: 76vw;
+  }
+
+  .landing-bear-girl {
+    top: -16%;
+    left: -17%;
+    width: clamp(5.2rem, 25vw, 7rem);
+  }
+
+  .landing-bear-boy {
+    right: -15%;
+    bottom: -17%;
+    width: clamp(5.7rem, 27vw, 7.5rem);
   }
 }
