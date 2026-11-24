@@ -31,7 +31,7 @@ class Settings:
     event_date: date = date.fromisoformat(_env("EVENT_DATE", "2026-11-29"))
     event_time: time = time.fromisoformat(_env("EVENT_TIME", "15:00:00"))
     event_place: str = _env("EVENT_PLACE", "Restaurante Pikito's")
-    report_end_date: date = date.fromisoformat(_env("REPORT_END_DATE", "2026-11-22"))
+    report_end_date: date = date.fromisoformat(_env("REPORT_END_DATE", "2026-11-25"))
     data_dir: Path = _configured_path("DATA_DIR", PROJECT_ROOT / "data")
     attendance_csv: Path = _configured_path(
         "ATTENDANCE_CSV", data_dir / "attendance.csv"
